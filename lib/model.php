@@ -17,6 +17,27 @@ function get_db(){
 
 /* Other functions can go below here */
 
+
+function new_product($productno, $description, $price,  $category,  $colour,  $size){
+   try{
+     $db = get_db();
+          $query = "INSERT INTO product (productno,description,price,category,colour,size) VALUES (?,?,?,?,?,?)";
+          if($statement = $db->prepare($query)){
+             $binding = array($productno, $description, $price,  $category,  $colour,  $size);
+             if(!$statement -> execute($binding)){
+                 throw new Exception("Could not execute query.");
+             }
+          }
+          else{
+            throw new Exception("Could not prepare statement.");
+
+          }
+     }
+
+   }
+
+
+
 function sign_up($email,$fname, $lname, $title, $address, $city, $state, $country, $postcode, $phone, $password, $password_confirm){
    try{
      $db = get_db();
@@ -47,6 +68,7 @@ function sign_up($email,$fname, $lname, $title, $address, $city, $state, $countr
    }
 
 }
+
 
 function sign_in($email,$password){
    try{

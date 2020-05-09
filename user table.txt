@@ -17,3 +17,14 @@ CREATE TABLE `customer` (
   salt char(16) NOT NULL,
   PRIMARY KEY (email)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `product` (
+  productno int(255) NOT NULL,
+  description varchar(255) NOT NULL,
+  price float(255) NOT NULL,
+  category varchar(255) NOT NULL,
+  colour varchar(255) NOT NULL,
+  size varchar(255) NOT NULL,
+  PRIMARY KEY (productno)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
