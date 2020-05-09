@@ -1,0 +1,53 @@
+#main{
+  width:500px;
+  margin:0 auto;
+
+}
+
+body{
+   font-family:Arial;
+}
+
+#content{
+  clear:both;
+  background:#eee;
+  padding:1em;
+  border-radius: 3px 3px 0 0;
+}
+
+#flash{
+  margin-top:-0.5em;
+  color:#ddd;
+  background:#b00;
+  padding: 0.5em;
+  border-radius: 3px;  
+}
+
+nav ul{
+  padding:0;
+}
+
+nav li{
+  list-style-type: none;
+  float:left;
+  margin: 0 0 1.2em 0;
+}
+
+nav a{
+  font-size:0.8em;
+  text-decoration:none;
+  margin: 0 1em 0 0;
+  background: #ddd;
+  padding: 0.5em 1em 0.5em 1em;
+  border-radius: 3px 3px 0 0;
+  color:#008;
+}
+
+input{
+  display:block;
+  margin-bottom:0.3em;
+}
+
+input[type=submit]{
+  margin-top: 1em;
+}
