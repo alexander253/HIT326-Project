@@ -1,0 +1,26 @@
+# Note access to sub-directories is disallowed in this instance. The only access is through the well-defined interface.
+# Also note CSS and JS files requested from the client can still be accessed. However clients will not be able to list the directory's contents.
+# If you want to allow external access to content in sub-directories of the root then uncomment the Apache directive ending with !-d
+
+# Here are meanings of the more cryptic symbols
+# -d Treats the TestString as a pathname and tests whether or not it exists, and is a directory. 
+# !-d If the request is for an existing directory then index.php isn't served.
+# -f treats the TestString as a pathname and tests whether or not it exists, and is a regular file
+# !-f If the request is for an existing file then index.php isn't served. 
+
+# The rewrite rule captures the request (in parenthesis). The capture is held in a variable called $1.
+# The rewrite is "index.php?" followed by the captured request.
+
+#[QLA] means if there are any query strings added to the request, append it to the rewrite target.
+#[L] - L means stop the rewriting process immediately and don't apply any more rules.
+
+# See http://httpd.apache.org/docs/current/mod/mod_rewrite.html for further details
+
+# The net effect of all this is to funnel all requests into a single file - index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f	
+	RewriteRule ^(.*)$ index.php?$1 [QSA,L]	
+</IfModule>

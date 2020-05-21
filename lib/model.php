@@ -17,65 +17,127 @@ function get_db(){
 
 /* Other functions can go below here */
 
+function addtocart(){
+  if(isset($_POST['addtocart'])) {
+    session_start();
+    $doggo= "daisy";
+    array_push($_SESSION['cart'],$doggo);
 
-function new_product($productno, $description, $price,  $category,  $colour,  $size){
-   try{
-     $db = get_db();
-          $query = "INSERT INTO product (productno,description,price,category,colour,size) VALUES (?,?,?,?,?,?)";
-          if($statement = $db->prepare($query)){
-             $binding = array($productno, $description, $price,  $category,  $colour,  $size);
-             if(!$statement -> execute($binding)){
-                 throw new Exception("Could not execute query.");
-             }
-          }
-          else{
-            throw new Exception("Could not prepare statement.");
+  }
+}
 
-          }
+function product_list(){
+  try{
+    $db = get_db();
+    $query = "SELECT productno, description, price, category, colour, size FROM product";
+    $statement = $db->prepare($query);
+    $statement ->execute();
+    $list = $statement->fetchall(PDO::FETCH_ASSOC);
+    return $list;
+  }
+  catch(PDOException $e){
+    throw new Exception($e->getMessage());
+    return "";
+  }
+  }
+
+  function my_account(){
+    try{
+      $db = get_db();
+      $query = "SELECT email,fname,lname,title,address,city,state,country,postcode,phone,salt,hashed_password FROM customer where email = 'coolazn818@hotmail.com'";
+      $statement = $db->prepare($query);
+      $statement ->execute();
+      $list = $statement->fetchall(PDO::FETCH_ASSOC);
+      $email= $list['email'];
+      return $list;
+    }
+    catch(PDOException $e){
+      throw new Exception($e->getMessage());
+      return "";
+    }
+    }
+
+  function sign_up($email,$fname, $lname, $title, $address, $city, $state, $country, $postcode, $phone, $password, $password_confirm){
+     try{
+       $db = get_db();
+
+       if(validate_user_name($db,$email) && validate_passwords($password,$password_confirm)){
+            $salt = generate_salt();
+            $password_hash = generate_password_hash($password,$salt);
+            $query = "INSERT INTO customer (email,fname,lname,title,address,city,state,country,postcode,phone,salt,hashed_password) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+            if($statement = $db->prepare($query)){
+               $binding = array($email,$fname, $lname, $title, $address, $city, $state, $country, $postcode, $phone,$salt,$password_hash);
+               if(!$statement -> execute($binding)){
+                   throw new Exception("Could not execute query.");
+               }
+            }
+            else{
+              throw new Exception("Could not prepare statement.");
+
+            }
+       }
+       else{
+          throw new Exception("Invalid data.");
+       }
+
+
+     }
+     catch(Exception $e){
+         throw new Exception($e->getMessage());
      }
 
+  }
+
+function get_user_id(){
+   $id="";
+   session_start();
+   if(!empty($_SESSION["id"])){
+      $id = $_SESSION["id"];
    }
+   session_write_close();
+   return $id;
+}
 
+function get_user_name(){
+   $email="";
+   $name="";
+   session_start();
+   if(!empty($_SESSION["email"])){
+      $email = $_SESSION["email"];
+   }
+   session_write_close();
 
-
-function sign_up($email,$fname, $lname, $title, $address, $city, $state, $country, $postcode, $phone, $password, $password_confirm){
    try{
-     $db = get_db();
-
-     if(validate_user_name($db,$email) && validate_passwords($password,$password_confirm)){
-          $salt = generate_salt();
-          $password_hash = generate_password_hash($password,$salt);
-          $query = "INSERT INTO customer (email,fname,lname,title,address,city,state,country,postcode,phone,salt,hashed_password) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
-          if($statement = $db->prepare($query)){
-             $binding = array($email,$fname, $lname, $title, $address, $city, $state, $country, $postcode, $phone,$salt,$password_hash);
-             if(!$statement -> execute($binding)){
+      $db = get_db();
+      $query = "SELECT fname FROM customer WHERE email=?";
+      if($statement = $db->prepare($query)){
+         $binding = array($email);
+         if(!$statement -> execute($binding)){
                  throw new Exception("Could not execute query.");
-             }
-          }
-          else{
+         }
+         else{
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+            $name = $result['name'];
+
+         }
+      }
+      else{
             throw new Exception("Could not prepare statement.");
-
-          }
-     }
-     else{
-        throw new Exception("Invalid data.");
-     }
-
+      }
 
    }
    catch(Exception $e){
-       throw new Exception($e->getMessage());
+      throw new Exception($e->getMessage());
    }
-
+   return $name;
 }
 
-
-function sign_in($email,$password){
+function sign_in($user_name,$password){
    try{
       $db = get_db();
       $query = "SELECT email, salt, hashed_password FROM customer WHERE email=?";
       if($statement = $db->prepare($query)){
-         $binding = array($email);
+         $binding = array($user_name);
          if(!$statement -> execute($binding)){
                  throw new Exception("Could not execute query.");
          }
@@ -88,7 +150,8 @@ function sign_in($email,$password){
             }
             else{
                $email = $result["email"];
-               set_authenticated_session($email,$hashed_password);
+               $cart = array('cat', 'dog', 'mouse' );
+               set_authenticated_session($email,$hashed_password, $cart);
             }
          }
       }
@@ -102,14 +165,47 @@ function sign_in($email,$password){
    }
 }
 
-function set_authenticated_session($email,$password_hash){
-      session_start();
+function is_db_empty(){
+   $is_empty = false;
+   try{
+      $db = get_db();
+      $query = "SELECT email FROM customer WHERE email=?";
+      if($statement = $db->prepare($query)){
+	     $email="god@hotmail.com";
+         $binding = array($email);
+         if(!$statement -> execute($binding)){
+                 throw new Exception("Could not execute query.");
+         }
+         else{
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+            if(empty($result)){
+	          $is_empty = true;
+            }
+         }
+      }
+      else{
+            throw new Exception("Could not prepare statement.");
+      }
 
+   }
+   catch(Exception $e){
+      throw new Exception($e->getMessage());
+   }
+   return $is_empty;
+
+}
+
+function set_authenticated_session($email, $password_hash, $cart){
+      session_start();
       //Make it a bit harder to session hijack
       session_regenerate_id(true);
 
       $_SESSION["email"] = $email;
       $_SESSION["hash"] = $password_hash;
+      $_SESSION["cart"] = $cart;
+      $dogname= "kikki";
+      array_push($_SESSION['cart'],$dogname);
+
       session_write_close();
 }
 
@@ -145,9 +241,8 @@ function validate_password($password){
 function is_authenticated(){
     $email = "";
     $hash="";
-
     session_start();
-    if(!empty($_SESSION["email"]) && !empty($_SESSION["hash"])){
+    if(!empty($_SESSION["email"]) && !empty($_SESSION["hash"] )){
        $email = $_SESSION["email"];
        $hash = $_SESSION["hash"];
     }
