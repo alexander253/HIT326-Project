@@ -14,7 +14,15 @@ echo "<h1>$message</h1>";
      $postcode = htmlspecialchars($detail['postcode'],ENT_QUOTES, 'UTF-8');
      $phone= htmlspecialchars($detail['phone'],ENT_QUOTES, 'UTF-8');
 
-   echo "<p>{$email}, {$fname}, {$lname},{$title},{$address}, {$city}, {$state}, {$country},{$postcode}, {$phone}, {$hashed_password}, {$salt}</p>";
+   echo "<ul>
+   <li>Email: {$email}</li>
+   <li>First Name: {$fname}</li>
+   <li>Last Name: {$lname}</li>
+   <li>Address: {$address}</li>
+   <li>Phone number: {$phone}</li>
+   </ul>";
+
+
  }
 }
 

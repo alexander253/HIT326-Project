@@ -20,11 +20,20 @@ function get_db(){
 function addtocart(){
   if(isset($_POST['addtocart'])) {
     session_start();
-    $doggo= "daisy";
-    array_push($_SESSION['cart'],$doggo);
-
+    $code = $_POST['code'];
+    array_push($_SESSION['cart'],$code);
   }
 }
+
+function addproduct($productno, $description, $price, $category, $colour, $size){
+    $db = get_db();
+    $query = "INSERT INTO product (productno, description, price, category, colour, size) VALUES (?,?,?,?,?,?)";
+    $statement = $db->prepare($query);
+    $binding = array($productno, $description, $price, $category, $colour, $size);
+    $statement -> execute($binding);      
+    }
+
+
 
 function product_list(){
   try{
@@ -42,13 +51,15 @@ function product_list(){
   }
 
   function my_account(){
+    session_start();
     try{
       $db = get_db();
-      $query = "SELECT email,fname,lname,title,address,city,state,country,postcode,phone,salt,hashed_password FROM customer where email = 'coolazn818@hotmail.com'";
+      $query = "SELECT email,fname,lname,title,address,city,state,country,postcode,phone,salt,hashed_password FROM customer where email = ? ";
       $statement = $db->prepare($query);
-      $statement ->execute();
+      $email= $_SESSION["email"];
+      $binding = array($email);
+      $statement -> execute($binding);
       $list = $statement->fetchall(PDO::FETCH_ASSOC);
-      $email= $list['email'];
       return $list;
     }
     catch(PDOException $e){
@@ -150,7 +161,7 @@ function sign_in($user_name,$password){
             }
             else{
                $email = $result["email"];
-               $cart = array('cat', 'dog', 'mouse' );
+               $cart = array();
                set_authenticated_session($email,$hashed_password, $cart);
             }
          }
@@ -199,13 +210,9 @@ function set_authenticated_session($email, $password_hash, $cart){
       session_start();
       //Make it a bit harder to session hijack
       session_regenerate_id(true);
-
       $_SESSION["email"] = $email;
       $_SESSION["hash"] = $password_hash;
       $_SESSION["cart"] = $cart;
-      $dogname= "kikki";
-      array_push($_SESSION['cart'],$dogname);
-
       session_write_close();
 }
 

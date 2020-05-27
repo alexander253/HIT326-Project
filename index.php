@@ -53,13 +53,26 @@ get("/cart",function($app){
    $app->render(LAYOUT,"cart");
 });
 
+
+
 post("/addtocart",function($app){
+          require MODEL;
+          addtocart();
+          $app->set_flash(htmlspecialchars("Your cart has been updated"));
+          $app->redirect_to("/cart");
+
+      });
+
+
+
+
+
+get("/addproduct",function($app){
    //$app->force_to_http("/art/1");
    $app->set_message("title","My Cart");
    $app->set_message("message","Your cart:");
    require MODEL;
-   $app->set_message("cart", addtocart());
-   $app->render(LAYOUT,"cart");
+   $app->render(LAYOUT,"addproduct");
 });
 
 
@@ -246,6 +259,26 @@ put("/change",function($app){
   $app->set_flash("Password is changed");
   $app->redirect_to("/");
 });
+
+post("/addproduct",function($app){
+          require MODEL;
+          $productno = $app->form('num');
+          $description = $app->form('desc');
+          $price = $app->form('price');
+          $category = $app->form('cate');
+          $colour = $app->form('col');
+          $size = $app->form('size');
+
+          if($productno && $description && $price && $category && $colour && $size){
+          addproduct($productno, $description, $price, $category, $colour, $size);
+          $app->set_flash(htmlspecialchars($app->form('desc'))." is now added ");
+          }
+          $app->redirect_to("/products");
+
+      })
+
+;
+
 
 # The Delete call back is left for you to work out
 

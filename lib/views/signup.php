@@ -13,8 +13,8 @@
     require PARTIALS."/form.country.php";
     require PARTIALS."/form.postcode.php";
     require PARTIALS."/form.phone.php";
-	require PARTIALS."/form.password.php";
-	require PARTIALS."/form.password-confirm.php";
+	  require PARTIALS."/form.password.php";
+	  require PARTIALS."/form.password-confirm.php";
 
  ?>
  <input type='submit' value='Sign up' />

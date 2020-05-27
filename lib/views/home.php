@@ -1,27 +1,24 @@
 <?php
 echo "<h1>$message</h1>";
-echo "<h2>You are currently signed in as:</h2>";
-echo $_SESSION['email'];
-echo "<h2>Your cart:</h2>";
 
-foreach($_SESSION['cart'] as $key=>$value)
-    {
-    echo $value." ";
-    }
-
-
+if(!empty($_SESSION["email"])){
+  echo "<h2>You are currently signed in as:</h2>";
+  echo $_SESSION['email'];
+  echo "<h2>Your cart:</h2>";
+}
+  else {
+    echo "You are not signed in, sign or sign up to start shopping!";}
 
 
+if(!empty($_SESSION["cart"])){
+  foreach($_SESSION['cart'] as $key=>$value)
+    {echo $value." <br><br>";}
+}
+  else {echo " <br> Your cart is empty, start shopping!";}
 
-    if(isset($_POST['addtocart'])) {
-      session_start();
-      $doggo= "daisy";
-      array_push($_SESSION['cart'],$doggo);
 
- }
+
+
+
 
  ?>
-
- <form  method='POST'>
-    <input type='submit' value='Add to cart' name="addtocart" />
- </form>
