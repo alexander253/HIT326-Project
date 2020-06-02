@@ -1,0 +1,7 @@
+CREATE TABLE `purchaseitem` (
+  itemno int(255) NOT NULL,
+  purchaseno int(255) NOT NULL,
+  productno int(255) NOT NULL
+
+
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

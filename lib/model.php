@@ -1,8 +1,8 @@
 <?php
 
+#get database connection
 function get_db(){
     $db = null;
-
     try{
         $db = new PDO('mysql:host=localhost:3308;dbname=art_db', 'root','hit325');
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -12,11 +12,10 @@ function get_db(){
         throw new Exception("Something wrong with the database: ".$e->getMessage());
     }
     return $db;
-
 }
 
-/* Other functions can go below here */
 
+#add to cart function
 function addtocart(){
   if(isset($_POST['addtocart'])) {
     session_start();
@@ -25,16 +24,62 @@ function addtocart(){
   }
 }
 
-function addproduct($productno, $description, $price, $category, $colour, $size){
-    $db = get_db();
-    $query = "INSERT INTO product (productno, description, price, category, colour, size) VALUES (?,?,?,?,?,?)";
-    $statement = $db->prepare($query);
-    $binding = array($productno, $description, $price, $category, $colour, $size);
-    $statement -> execute($binding);      
+#get all cart items and return into "list" for later use
+function cart(){
+  session_start();
+  if(!empty($_SESSION["cart"])){
+  foreach($_SESSION['cart'] as $key=>$value)
+    {
+      $db = get_db();
+      $query = "SELECT description, price FROM product where productno = ? ";
+      $statement = $db->prepare($query);
+      $productno= $value;
+      $binding = array($value);
+      $statement -> execute($binding);
+      $list = $statement->fetchall(PDO::FETCH_ASSOC);
+      return $list;
     }
+  }
+}
 
+#Add product
+function addproduct( $description, $price, $category, $colour, $size){
+    $db = get_db();
+    $query = "INSERT INTO product (description, price, category, colour, size) VALUES (?,?,?,?,?)";
+    $statement = $db->prepare($query);
+    $binding = array($description, $price, $category, $colour, $size);
+    $statement -> execute($binding);
+}
 
+#place order stores data into "purchase" and "purchaseitem" tables
+function placeorder($date, $email, $purchaseno, $itemno, $productno){
+    session_start();
+    $db = get_db();
 
+    #store purchase number,date and email into database
+    $query1 = "INSERT INTO purchase (purchaseno, date, email) VALUES (?,?,?)";
+    $statement = $db->prepare($query1);
+    $binding = array($purchaseno, $date, $email);
+    $statement -> execute($binding);
+
+    #generate random number for item number
+    $autogen= mt_rand(1,255);
+    #iterate through cart array and store each item into database
+    if(!empty($_SESSION["cart"])){
+    foreach($_SESSION['cart'] as $key=>$value)
+        { $productno= $value;
+          $itemno= $autogen;
+
+    $query2 = "INSERT INTO purchaseitem (itemno, purchaseno, productno) VALUES (?,?,?)";
+    $statement = $db->prepare($query2);
+    $binding = array($itemno, $purchaseno, $productno);
+    $statement -> execute($binding);
+
+      }
+    }
+  }
+
+#get all product items from database
 function product_list(){
   try{
     $db = get_db();
@@ -50,6 +95,7 @@ function product_list(){
   }
   }
 
+#get all account details from database
   function my_account(){
     session_start();
     try{
@@ -68,6 +114,7 @@ function product_list(){
     }
     }
 
+#signup function
   function sign_up($email,$fname, $lname, $title, $address, $city, $state, $country, $postcode, $phone, $password, $password_confirm){
      try{
        $db = get_db();
@@ -84,19 +131,15 @@ function product_list(){
             }
             else{
               throw new Exception("Could not prepare statement.");
-
             }
        }
        else{
           throw new Exception("Invalid data.");
        }
-
-
      }
      catch(Exception $e){
          throw new Exception($e->getMessage());
      }
-
   }
 
 function get_user_id(){
@@ -143,6 +186,7 @@ function get_user_name(){
    return $name;
 }
 
+#sign in function with cart array intiated
 function sign_in($user_name,$password){
    try{
       $db = get_db();
@@ -169,13 +213,13 @@ function sign_in($user_name,$password){
       else{
             throw new Exception("Could not prepare statement.");
       }
-
    }
    catch(Exception $e){
       throw new Exception($e->getMessage());
    }
 }
 
+#checks if database is empty
 function is_db_empty(){
    $is_empty = false;
    try{
@@ -197,7 +241,6 @@ function is_db_empty(){
       else{
             throw new Exception("Could not prepare statement.");
       }
-
    }
    catch(Exception $e){
       throw new Exception($e->getMessage());
@@ -206,6 +249,7 @@ function is_db_empty(){
 
 }
 
+#added cart array
 function set_authenticated_session($email, $password_hash, $cart){
       session_start();
       //Make it a bit harder to session hijack
@@ -225,10 +269,8 @@ function generate_salt(){
     return str_shuffle($chars);
 }
 
+#not implemented
 function validate_user_name($db,$user_name){
-    // is it a valid name?
-    // use get_user_id function. if empty then it doesn't exist
-    // if all good return true, other return false
     return true;
 }
 
@@ -239,8 +281,8 @@ function validate_passwords($password, $password_confirm){
    return false;
 }
 
+#not implemented
 function validate_password($password){
-  //Does the password pass the strong password tests
   return true;
 }
 
@@ -292,10 +334,4 @@ function sign_out(){
        session_destroy();
     }
     session_write_close();
-}
-
-
-function change_password($user_id, $old_pw, $new_pw, $pw_confirm){
-
-
 }

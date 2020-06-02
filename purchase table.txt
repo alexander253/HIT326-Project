@@ -1,0 +1,7 @@
+
+CREATE TABLE `purchase` (
+  purchaseno varchar(255) NOT NULL,
+  date varchar(255) NOT NULL,
+  email varchar(255) NOT NULL,
+  PRIMARY KEY (purchaseno)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

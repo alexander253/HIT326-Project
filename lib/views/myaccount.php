@@ -1,6 +1,6 @@
 <?php
 echo "<h1>$message</h1>";
- //Print the list of products
+ //Print the list of account details
  if(!empty($list)){
    foreach($list As $detail){
      $email = htmlspecialchars($detail['email'],ENT_QUOTES, 'UTF-8');

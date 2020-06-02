@@ -49,7 +49,7 @@ get("/cart",function($app){
    $app->set_message("title","My Cart");
    $app->set_message("message","Your cart:");
    require MODEL;
-   $app->set_message("list", my_account());
+   $app->set_message("list", cart());
    $app->render(LAYOUT,"cart");
 });
 
@@ -64,9 +64,6 @@ post("/addtocart",function($app){
       });
 
 
-
-
-
 get("/addproduct",function($app){
    //$app->force_to_http("/art/1");
    $app->set_message("title","My Cart");
@@ -74,7 +71,6 @@ get("/addproduct",function($app){
    require MODEL;
    $app->render(LAYOUT,"addproduct");
 });
-
 
 
 
@@ -192,7 +188,7 @@ post("/signup",function($app){
 
           $email = $app->form('email');
           $fname = $app->form('fname');
-          $lname = $app->form('fname');
+          $lname = $app->form('lname');
           $title = $app->form('title');
           $address = $app->form('address');
           $city = $app->form('city');
@@ -262,20 +258,52 @@ put("/change",function($app){
 
 post("/addproduct",function($app){
           require MODEL;
-          $productno = $app->form('num');
           $description = $app->form('desc');
           $price = $app->form('price');
           $category = $app->form('cate');
           $colour = $app->form('col');
           $size = $app->form('size');
 
-          if($productno && $description && $price && $category && $colour && $size){
-          addproduct($productno, $description, $price, $category, $colour, $size);
+          if($description && $price && $category && $colour && $size){
+          addproduct($description, $price, $category, $colour, $size);
           $app->set_flash(htmlspecialchars($app->form('desc'))." is now added ");
           }
           $app->redirect_to("/products");
 
-      })
+      });
+
+post("/cart",function($app){
+                session_start();
+                require MODEL;
+                $cart= $_SESSION['cart'];
+
+                #just testing for now, will change to auto in phpmyadmin
+                #for purchase table
+                $date = date("l jS \of F Y h:i:s A");
+                $purchaseno= mt_rand(1,255);
+                $email= $_SESSION["email"];
+
+                #purchase item table
+                $autogen= mt_rand(1,255);
+
+                if(!empty($_SESSION["cart"])){
+                foreach($_SESSION['cart'] as $key=>$value)
+                    { $productno= $value;
+                      $itemno= $autogen;
+                      }
+                }
+
+
+
+                if($productno && $itemno){
+                placeorder($date, $email, $purchaseno, $itemno, $productno);
+                $app->set_flash(htmlspecialchars(" Your order is now placed "));
+                }
+                $app->redirect_to("/myaccount");
+
+            })
+
+
 
 ;
 

@@ -16,7 +16,7 @@ echo "<h1>$message</h1>";
   echo "
      <form  method='POST'>
        <div class='product'>
-            <input type='hidden' name='code' value= '{$description} <br> Price:{$price}' />
+            <input type='hidden' name='code' value= '{$productno}' />
               <ul>
                 <li>Description: {$description}</li>
                 <li>Price: {$price}</li>
@@ -41,5 +41,7 @@ echo "<h1>$message</h1>";
      $code = $_POST['code'];
      array_push($_SESSION['cart'],$code);
    }
+
+
 
  ?>
