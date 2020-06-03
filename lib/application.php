@@ -1,10 +1,9 @@
 <?php
-/* NEW added third argument "GET" */
+
 function get($route,$callback){
     Application::register($route,$callback,"GET");
 }
 
-/* NEW added next three functions */
 function post($route,$callback){
     Application::register($route,$callback,"POST");
 }
@@ -17,7 +16,7 @@ function delete($route,$callback){
     Application::register($route,$callback,"DELETE");
 }
 
-/* New, if none of the above routes match, then we have a 404 error */
+/* If none of the above routes match, then we have a 404 error */
 function resolve(){
 	Application::resolve();
 }
@@ -26,31 +25,27 @@ class Application{
     private static $instance;
     private static $route_found = false;
     private $route = "";
-
-    /* Added properties */
     private $messages = array();
     private $method = "";
-    
+
     public static function get_instance(){
         if(!isset(static::$instance)){
             static::$instance = new Application();
         }
         return static::$instance;
     }
-    
+
     protected function __construct(){
         $this->route = $this->get_route();
-        /* New */
         $this->method = $this->get_method();
     }
-    
+
     public function get_route(){
-      return $_SERVER['REQUEST_URI'];  
+      return $_SERVER['REQUEST_URI'];
     }
-    
+
     public static function register($route,$callback, $method){
         $application = static::get_instance();
-        /* NEW addition of method at end */
         if($route == $application->route && !static::$route_found && $application->method == $method){
             static::$route_found = true;
             echo $callback($application);
@@ -58,8 +53,8 @@ class Application{
         else{
             return false;
         }
-    }   
-    
+    }
+
     /* All the the methods below come from week 6 functions in application.php i.e. example 17*/
 
 
@@ -70,7 +65,7 @@ class Application{
        foreach($this->messages As $key => $val){
             $$key = $val;
        }
-       
+
 
        $flash = $this->get_flash();
 
@@ -80,7 +75,6 @@ class Application{
           require VIEWS."/{$layout}.layout.php";
        }
        else{
-          // What is this part for? When would we not need a layout? Think about it.
        }
        exit();
     }
@@ -158,9 +152,9 @@ class Application{
     }
 
     public function get_flash(){
-          return $this->get_session_message("flash");   
+          return $this->get_session_message("flash");
     }
-    
+
     /* added to remove global message from procedural technique*/
     public function set_message($key,$value){
       $this->messages[$key] = $value;
@@ -171,7 +165,7 @@ class Application{
 	  if(!static::$route_found){
 		$application = static::get_instance();
 		header("HTTP/1.0 404 Not Found");
-	    $application->render("standard","404");	
+	    $application->render("standard","404");
 	  }
     }
 
@@ -180,6 +174,3 @@ class Application{
 
 
 }
-
-
-

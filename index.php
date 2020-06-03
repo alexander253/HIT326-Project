@@ -10,7 +10,6 @@ DEFINE("LIB",$_SERVER['DOCUMENT_ROOT']."/lib/");
 DEFINE("VIEWS",LIB."views/");
 DEFINE("PARTIALS",VIEWS."/partials");
 
-
 # Paths to actual files
 DEFINE("MODEL",LIB."/model.php");
 DEFINE("APP",LIB."/application.php");
@@ -26,8 +25,9 @@ require APP;
 /* Here is our Controller code i.e. API if you like.  */
 /* The following are just examples of how you might set up a basic app with authentication */
 
+
+#GET Functions
 get("/products",function($app){
-   //$app->force_to_http("/art/1");
    $app->set_message("title","Darwin Art Company");
    $app->set_message("message","Products");
    require MODEL;
@@ -36,7 +36,6 @@ get("/products",function($app){
 });
 
 get("/myaccount",function($app){
-   //$app->force_to_http("/art/1");
    $app->set_message("title","Darwin Art Company");
    $app->set_message("message","My Account");
    require MODEL;
@@ -45,7 +44,6 @@ get("/myaccount",function($app){
 });
 
 get("/cart",function($app){
-   //$app->force_to_http("/art/1");
    $app->set_message("title","My Cart");
    $app->set_message("message","Your cart:");
    require MODEL;
@@ -53,26 +51,12 @@ get("/cart",function($app){
    $app->render(LAYOUT,"cart");
 });
 
-
-
-post("/addtocart",function($app){
-          require MODEL;
-          addtocart();
-          $app->set_flash(htmlspecialchars("Your cart has been updated"));
-          $app->redirect_to("/cart");
-
-      });
-
-
 get("/addproduct",function($app){
-   //$app->force_to_http("/art/1");
    $app->set_message("title","My Cart");
    $app->set_message("message","Your cart:");
    require MODEL;
    $app->render(LAYOUT,"addproduct");
 });
-
-
 
 get("/",function($app){
   require MODEL;
@@ -90,7 +74,8 @@ get("/signin",function($app){
    require MODEL;
    try{
      if(is_authenticated()){
-        $app->set_message("error","Why on earth do you want to sign in again. You are already signed in. Perhaps you want to sign out first.");
+        $app->set_message("error","Why on earth do you want to sign in again.
+        You are already signed in. Perhaps you want to sign out first.");
      }
    }
    catch(Exception $e){
@@ -117,7 +102,9 @@ get("/signup",function($app){
         $app->set_message("error","Create more accounts for other users.");
     }
     else if(!$is_authenticated && $is_db_empty){
-       $app->set_message("error","You are the SUPER USER. This account cannot be deleted. You are the boss. The only way to clear the SUPER USER from the database is to DROP the entire table. Please sign in after you have finished signing up.");
+       $app->set_message("error","You are the SUPER USER. This account cannot be deleted. You are the boss.
+       The only way to clear the SUPER USER from the database is to DROP the entire table.
+       Please sign in after you have finished signing up.");
     }
     else{
        $app->set_flash("You are not authorised to access this resource yet. I'm gonna tell your mum if you don't sign in.");
@@ -155,9 +142,7 @@ get("/change",function($app){
    $app->render(LAYOUT,"change_password");
 });
 
-
 get("/signout",function($app){
-   // should this be GET or POST or PUT?????
    $app->force_to_http("/signout");
    require MODEL;
    if(is_authenticated()){
@@ -175,17 +160,22 @@ get("/signout",function($app){
         $app->set_flash("You can't sign out if you are not signed in!");
         $app->redirect_to("/signin");
    }
-
-
-
 });
 
+
+#POST Functions
+
+post("/addtocart",function($app){
+    require MODEL;
+    addtocart();
+    $app->set_flash(htmlspecialchars("Your cart has been updated"));
+    $app->redirect_to("/cart");
+  });
 
 post("/signup",function($app){
     require MODEL;
     try{
         if(is_authenticated() || is_db_empty()){
-
           $email = $app->form('email');
           $fname = $app->form('fname');
           $lname = $app->form('lname');
@@ -219,13 +209,10 @@ post("/signup",function($app){
            $app->set_flash("You are not authorised to access this resource");
            $app->redirect_to("/");
         }
-
     }
     catch(Exception $e){
          $app->set_flash($e.getMessage());
          $app->redirect_to("/");
-
-
     }
 });
 
@@ -250,65 +237,59 @@ post("/signin",function($app){
   $app->redirect_to("/");
 });
 
+#doesnt work
 put("/change",function($app){
   // Not complete because can't handle complex routes like /change/23
   $app->set_flash("Password is changed");
   $app->redirect_to("/");
 });
 
-post("/addproduct",function($app){
-          require MODEL;
-          $description = $app->form('desc');
-          $price = $app->form('price');
-          $category = $app->form('cate');
-          $colour = $app->form('col');
-          $size = $app->form('size');
 
-          if($description && $price && $category && $colour && $size){
-          addproduct($description, $price, $category, $colour, $size);
-          $app->set_flash(htmlspecialchars($app->form('desc'))." is now added ");
+post("/addproduct",function($app){
+      require MODEL;
+      $description = $app->form('desc');
+      $price = $app->form('price');
+      $category = $app->form('cate');
+      $colour = $app->form('col');
+      $size = $app->form('size');
+
+      if($description && $price && $category && $colour && $size){
+      addproduct($description, $price, $category, $colour, $size);
+      $app->set_flash(htmlspecialchars($app->form('desc'))." is now added ");
           }
-          $app->redirect_to("/products");
+      $app->redirect_to("/products");
 
       });
 
 post("/cart",function($app){
-                session_start();
-                require MODEL;
-                $cart= $_SESSION['cart'];
+      session_start();
+      require MODEL;
+      $cart= $_SESSION['cart'];
 
-                #just testing for now, will change to auto in phpmyadmin
-                #for purchase table
-                $date = date("l jS \of F Y h:i:s A");
-                $purchaseno= mt_rand(1,255);
-                $email= $_SESSION["email"];
+      #for purchase table
+      $date = date("l jS \of F Y h:i:s A");
+      $purchaseno= mt_rand(1,255);
+      $email= $_SESSION["email"];
 
-                #purchase item table
-                $autogen= mt_rand(1,255);
+      #purchase item table
+      $autogen= mt_rand(1,255);
 
-                if(!empty($_SESSION["cart"])){
-                foreach($_SESSION['cart'] as $key=>$value)
-                    { $productno= $value;
-                      $itemno= $autogen;
+      if(!empty($_SESSION["cart"])){
+        foreach($_SESSION['cart'] as $key=>$value)
+            { $productno= $value;
+              $itemno= $autogen;
                       }
                 }
+      if($productno && $itemno){
+        placeorder($date, $email, $purchaseno, $itemno, $productno);
+        $app->set_flash(htmlspecialchars(" Your order is now placed "));
+        }
+        $app->redirect_to("/myaccount");
 
-
-
-                if($productno && $itemno){
-                placeorder($date, $email, $purchaseno, $itemno, $productno);
-                $app->set_flash(htmlspecialchars(" Your order is now placed "));
-                }
-                $app->redirect_to("/myaccount");
-
-            })
-
-
-
+      })
 ;
 
 
 # The Delete call back is left for you to work out
-
 // New. If it get this far then page not found
 resolve();

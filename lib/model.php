@@ -141,7 +141,7 @@ function product_list(){
          throw new Exception($e->getMessage());
      }
   }
-
+#doesnt work/not in use
 function get_user_id(){
    $id="";
    session_start();
@@ -152,6 +152,7 @@ function get_user_id(){
    return $id;
 }
 
+#doesnt work/not in use
 function get_user_name(){
    $email="";
    $name="";
@@ -273,7 +274,7 @@ function generate_salt(){
 function validate_user_name($db,$user_name){
     return true;
 }
-
+#not implemented
 function validate_passwords($password, $password_confirm){
    if($password === $password_confirm && validate_password($password)){
       return true;
