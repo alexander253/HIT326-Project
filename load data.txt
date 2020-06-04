@@ -1,9 +1,0 @@
-use art_db
-
-#Customer
-INSERT INTO `customer` (`email`, `fname`, `lname`, `title`, `address`, `city`, `state`, `country`, `postcode`, `phone`, `hashed_password`, `salt`) VALUES ('bob@hotmail.com', 'Bob', 'Marley', 'MR', 'Somewhere in land far away', 'Darwin', 'NT', 'Australia', '0899', '04204401', '1234', '1234');
-
-
-#Product
-
-INSERT INTO `product` (`productno`, `description`, `price`, `category`, `colour`, `size`) VALUES (NULL, 'Starry Night', '250', 'Rare', 'Blue', 'Medium'), (NULL, 'The Last supper', '500', 'common', 'green', 'large'), (NULL, 'Girl with a pearl', '20000', 'Rare', 'Green', 'Meduim');
